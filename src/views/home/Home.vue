@@ -5,8 +5,7 @@
       <div slot="center">购物街</div>
     </nav-bar>
 
-
-    <scroll class="content">
+    <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
       <home-swiper :banners="banners"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
@@ -14,7 +13,8 @@
                    :titles="['流行','新款','精选']" @tabClick="tabClick"/>
       <goods-list :goods="showGoods"/>
     </scroll>
-   
+
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
   </div>
 
 </template>
@@ -28,6 +28,7 @@ import TabControl from "@/components/content/tabControl/TabControl";
 import GoodsList from "@/components/content/goods/GoodsList";
 import BScoll from "better-scroll";
 import Scroll from "@/components/common/scroll/Scroll";
+import BackTop from "@/components/content/backTop/BackTop";
 
 import {getHomeMultidata} from "@/network/home";
 import {getHomeGoods} from "@/network/home";
@@ -44,9 +45,8 @@ export default {
     TabControl,
     GoodsList,
     BScoll,
-    Scroll
-   
-
+    Scroll,
+    BackTop
   },
   data(){
     return{
@@ -57,7 +57,8 @@ export default {
         'new': {page: 0, list: []},
         'sell': {page: 0, list: []},
       },
-      currentType:'pop'
+      currentType:'pop',
+      isShowBackTop:true
     }
   },
   computed:{
@@ -75,6 +76,15 @@ export default {
     this.getHomeGoods('sell')
   },
   methods:{
+    contentScroll(position){
+      this.isShowBackTop = (-position.y) > 1000
+
+    },
+
+    backClick(){
+      this.$refs.scroll.scrollTo(0,0,600);
+    },
+
     //事件监听相关的方法
     tabClick(index){
       switch (index) {
@@ -108,7 +118,6 @@ export default {
         this.goods[type].page += 1
       });
     }
-
   }
 }
 </script>
